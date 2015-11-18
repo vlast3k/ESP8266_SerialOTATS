@@ -27,5 +27,6 @@ void atSetWifi(char *ssid, char *pass) {
   strcpy(tmp, pass);
   EEPROM.put(EE_WIFI_PASS_30B, tmp);
   EEPROM.commit();
+  startWifi();
 }
 

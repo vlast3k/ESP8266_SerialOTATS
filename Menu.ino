@@ -45,8 +45,10 @@ int handleCommand() {
   Serial << "Received command: " << line << endl;
   if      (line[0] == 'o') startOTA();
   else if (line[0] == 't') sendTS();
-  else if (line[0] == 'g') sendGoogle();
+  else if (line[0] == 'p') sendPing();
   else if (line[0] == 'A') mockATCommand(line);
+  else if (line[0] == 'S') httpAuthSAP();
+  else if (line[0] == 'C') checkSAPAuth();
   return 0;
 }
 
