@@ -11,7 +11,9 @@ void startOTA();
 
 #define EE_WIFI_SSID_30B 0
 #define EE_WIFI_PASS_30B 30
-#define EE_LAST 60
+#define EE_WIFI_SG_USER_10B 60
+#define EE_WIFI_SG_PASS_10B 70
+#define EE_LAST 80
 void setup() {
   Serial.begin(9600);
   EEPROM.begin(1024);

@@ -4,6 +4,16 @@ void sendTS() {
 
 boolean traceHttp = false;
 
+int setSAPGuestCredentials(char *user, char *pass) {
+  char tmp[10];
+  strcpy(tmp, user);
+  EEPROM.put(EE_WIFI_SG_USER_10B, tmp);
+  strcpy(tmp, pass);
+  EEPROM.put(EE_WIFI_SG_PASS_10B, tmp);
+  EEPROM.commit();
+  return checkSAPAuth();
+}
+
 int checkSAPAuth() {
   if (sendPing() == 302) {
     int as = httpAuthSAP();
@@ -29,8 +39,14 @@ int sendPing() {
 }
 
 int httpAuthSAP() {
-  char userName[] = "36121513";
-  char pass[] = "57cKi5wE";
+  char userName[10];// = "36121513";
+  char pass[10];// = "57cKi5wE";
+  EEPROM.get(EE_WIFI_SG_USER_10B, userName);
+  EEPROM.get(EE_WIFI_SG_PASS_10B, pass);
+  if (userName[0] < 2) {
+    Serial << "Missing SAP-Guest user/pass" << endl;
+    return -1;
+  }
   char postData[100];
   sprintf(postData, "user=%s&password=%s&cmd=authenticate&url=http%3A%2F%2Fgoogle.bg%2F&Login=Log+In", userName, pass);
 
@@ -40,7 +56,8 @@ int httpAuthSAP() {
                    
   int rc = sendHTTP("securelogin.wlan.sap.com", "POST", "/cgi-bin/login", headers.c_str(), postData, true);
   Serial << "SAP Auth Response is: " << rc << endl;
-  return rc;
+  if (rc == -1 || rc == 200) return 1;
+  else return -1;
   // rc == -1 - timeout connect = connection exists
   // rc == 302 - bad user pass
   // rc == 200 - authenticated
