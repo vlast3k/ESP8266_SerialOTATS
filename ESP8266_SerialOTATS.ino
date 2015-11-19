@@ -17,7 +17,7 @@ void startOTA();
 void setup() {
   Serial.begin(9600);
   EEPROM.begin(1024);
-  Serial.println("ready");
+  Serial << endl << "ready" << endl;
   startWifi();
 }
 
@@ -29,7 +29,7 @@ void startWifi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Connection Failed! cannot connect to Wifi...");
+    Serial.println("Cannot connect to Wifi !");
     return;
   }
   Serial << "IP address: " << WiFi.localIP() << endl;

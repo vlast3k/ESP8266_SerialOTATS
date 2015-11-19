@@ -2,7 +2,12 @@ void sendTS() {
   //sendHTTP("api.thingspeak.com", "GET", "/update?key=8U1HL3MF593FILFK&field1=456", false);
 }
 
-boolean traceHttp = false;
+void getTS(const char* line) {
+  sendHTTP("api.thingspeak.com", "GET", line + 4, NULL, NULL, false, false);
+}
+
+
+boolean traceHttp = true;
 
 int setSAPGuestCredentials(char *user, char *pass) {
   char tmp[10];
@@ -32,7 +37,7 @@ int checkSAPAuth() {
 }
 
 int sendPing() {
-  return sendHTTP("ping.eu", "HEAD", "/", NULL, NULL, false);
+  return sendHTTP("ping.eu", "HEAD", "/", NULL, NULL, false, true);
 
   //302 - no connection
   //200 - connection ok
@@ -54,7 +59,7 @@ int httpAuthSAP() {
                    + "User-Agent: Mozilla/5.0\n"
                    + "Referer: https://emea-guest.wlan.sap.com/guest/sap_guest_register_login.php?_browser=1\n";
                    
-  int rc = sendHTTP("securelogin.wlan.sap.com", "POST", "/cgi-bin/login", headers.c_str(), postData, true);
+  int rc = sendHTTP("securelogin.wlan.sap.com", "POST", "/cgi-bin/login", headers.c_str(), postData, true, true);
   Serial << "SAP Auth Response is: " << rc << endl;
   if (rc == -1 || rc == 200) return 1;
   else return -1;
@@ -64,7 +69,7 @@ int httpAuthSAP() {
   
 }
 
-int sendHTTP(const char* host, const char* method, const char *url, const char* headers, const char* postData, boolean secure) {
+int sendHTTP(const char* host, const char* method, const char *url, const char* headers, const char* postData, boolean secure, boolean sendHeaders) {
   WiFiClient *client;
   if (secure) client = new WiFiClientSecure();
   else client = new WiFiClient();
@@ -77,22 +82,24 @@ int sendHTTP(const char* host, const char* method, const char *url, const char* 
   }
 
   
-  Serial << "Requesting URL: " << url << endl;
-  
+  //Serial << "Requesting URL: " << url << endl;
+  String rq = String(method) + " " + url + (sendHeaders?" HTTP/1.1":"") + "\r\n";
+  if (sendHeaders)
+     rq += String("Host: ") + host + "\r\n" + 
+           (postData? (String("Content-Length: ") + strlen(postData) + "\r\n") : "") +
+           (headers ? headers : "\r\n");
+   rq += "\r\n";
   // This will send the request to the server
-  client->print(String(method) + " " + url + " HTTP/1.1\n" +
-               "Host: " + host + "\r\n" + 
-               (postData? (String("Content-Length: ") + strlen(postData) + "\n") : "") +
-               (headers ? headers : "\n") +
-               "\n");
-               //"Connection: close\n\n");
+  Serial << "Requesting: " << endl << rq << endl;
+  client->print(rq);
+
   if (postData) client->print(postData);
   
   Serial << "Waiting Respomse " << endl;
   int timeout = 0;
   while (!client->available()) {
-    delay(10);
     if (timeout += 10 > 3000) break;
+    delay(10);
   }
   Serial << "Response time: " << timeout << endl ;
   
@@ -106,6 +113,7 @@ int sendHTTP(const char* host, const char* method, const char *url, const char* 
       if (traceHttp) Serial << (buf);
     }
     Serial << endl << "--------- done, rc=" << responseCode << endl;
+    Serial << endl << "CLOSED" << endl;
     return responseCode;
   } else {
     Serial << "Timeout !" << endl;

@@ -15,10 +15,17 @@ void mockATCommand(const char *line) {
       Serial << "found : " << ssid << " , " << pass << endl;
       atSetWifi(ssid, pass);
     }
+
+    end:
+    if (strstr(line, "AT+CIPSEND")) {
+      Serial << ">" << endl; 
+    } else {
+      Serial << "OK" << endl;
+    }
   }
-end:
-  Serial << "OK" << endl;
+
 }
+
 
 void atSetWifi(char *ssid, char *pass) {
   char tmp[30];

@@ -21,27 +21,8 @@ void processUserInput() {
 
   Serial << F("Menu Timed out") << endl;
 }
-/*
- * "AT+CIPSTART=\"TCP\",\"184.106.153.149\",80")
- * "GET /update?key=%s&field1=%d&field2=%d.%d&field3=%d.%d&field4=%d.%d&field5=%d.%d\n\n"
- *   esp << F("AT+CIPSEND=") << len << endl;
-  if (!serialFind(">", true, 6000)) return -3;
-  esp << sendstr;
 
-   if (!serialFind("GOT IP", true, 30000)) {
-
-     esp << F("AT+CWMODE_DEF=1") << endl;
-       esp << F("AT") << endl;
-         if (!serialFind(OK)) return -1;
-  serialFind(OK, ESP_DEBUG, 1000);
-  esp << F("AT+CWJAP_DEF=") << F("\"") << ssid << F("\"") << F(",") << F("\"") << pass << F("\"") << endl;
-  if (!serialFind(GOTIP, ESP_DEBUG, 20000)) return -2;
-  esp << F("AT+CWAUTOCONN=1") << endl;
-
-  serialFind("ready", ESP_DEBUG, 6000);
- */
 int handleCommand() {
-//  String data = String(line).substring(2);
   Serial << "Received command: " << line << endl;
   if      (line[0] == 'o') startOTA();
   else if (line[0] == 't') sendTS();
@@ -49,6 +30,7 @@ int handleCommand() {
   else if (line[0] == 'A') mockATCommand(line);
   else if (line[0] == 'S') httpAuthSAP();
   else if (line[0] == 'C') checkSAPAuth();
+  else if (line[0] == 'G') getTS(line);
   return 0;
 }
 
