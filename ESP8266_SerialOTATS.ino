@@ -36,7 +36,10 @@ void startWifi() {
   Serial << "GOT IP" << endl;
 }
 
+boolean startedOTA = false;
 void loop() {
   handleOTA();
-  processUserInput();
+  if (!startedOTA) {
+    processUserInput();
+  }
 }

@@ -1,6 +1,4 @@
 
-boolean startedOTA = false;
-
 void handleOTA() {
   if (startedOTA) ArduinoOTA.handle();
 }
