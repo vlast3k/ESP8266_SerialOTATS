@@ -28,10 +28,14 @@ void startWifi() {
   Serial << "Connecting to: " << ssid << endl;
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Cannot connect to Wifi !");
+  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("3Cannot connect to Wifi !" );
     return;
   }
+//  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+//    Serial.println("Cannot connect to Wifi !");
+//    return;
+//  }
   Serial << "IP address: " << WiFi.localIP() << endl;
   Serial << "GOT IP" << endl;
 }
