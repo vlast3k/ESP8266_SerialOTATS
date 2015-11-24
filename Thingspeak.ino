@@ -9,8 +9,18 @@ void getTS(const char* line) {
 
 boolean traceHttp = true;
 
+void setSAPAuth(const char *line)  {
+  char user[20], pass[20];
+  if (extractTwoStringsFromQuotes(line, user, pass)) {
+    setSAPGuestCredentials(user, pass);
+  } else {
+    Serial << "Could not parse SAP Auth credentials" << endl;
+  } 
+}
+
 int setSAPGuestCredentials(char *user, char *pass) {
-  char tmp[10];
+  Serial << "Setting SAP Auth: " << user << ", " << pass << endl;
+  char tmp[20];
   strcpy(tmp, user);
   EEPROM.put(EE_WIFI_SG_USER_10B, tmp);
   strcpy(tmp, pass);

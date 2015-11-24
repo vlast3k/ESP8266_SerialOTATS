@@ -5,10 +5,10 @@
 #include <ArduinoOTA.h>
 #include <Streaming.h>
 #include <EEPROM.h>
+#include <Math.h>
+#include <algorithm>    // std::min
 
-
-void startOTA();
-
+void setSAPAuth(const char *);
 #define EE_WIFI_SSID_30B 0
 #define EE_WIFI_PASS_30B 30
 #define EE_WIFI_SG_USER_10B 60
@@ -21,24 +21,6 @@ void setup() {
   startWifi();
 }
 
-void startWifi() {
-  char ssid[30], pass[30];
-  EEPROM.get(EE_WIFI_SSID_30B, ssid);
-  EEPROM.get(EE_WIFI_PASS_30B, pass);
-  Serial << "Connecting to: " << ssid << endl;
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, pass);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("3Cannot connect to Wifi !" );
-    return;
-  }
-//  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-//    Serial.println("Cannot connect to Wifi !");
-//    return;
-//  }
-  Serial << "IP address: " << WiFi.localIP() << endl;
-  Serial << "GOT IP" << endl;
-}
 
 boolean startedOTA = false;
 void loop() {

@@ -31,6 +31,8 @@ int handleCommand() {
   else if (line[0] == 'S') httpAuthSAP();
   else if (line[0] == 'C') checkSAPAuth();
   else if (line[0] == 'G') getTS(line);
+  else if (strstr(line, "sapAuth")) setSAPAuth(line);
+  else if (strstr(line, "wifi")) setWifi(line);
   return 0;
 }
 
@@ -64,5 +66,31 @@ void removeCRNL(char * str) {
       str[i] =0;
       return;
     }
+  }
+}
+
+int setWifi(const char* p) {
+  char s1[20], s2[20], s3[20];
+  p = extractStringFromQuotes(p, s1);
+  p = extractStringFromQuotes(p, s2);
+  p = extractStringFromQuotes(p, s3);
+
+  if (strstr(s1, "SAP-Guest")) {
+    if (s2 && s3) {
+      setSSIDPass("SAP-Guest", "aaaa");
+      setSAPGuestCredentials(s2, s3);
+    }
+  } else {
+    setSSIDPass(s1, s2);
+  }
+  return 0;
+}
+
+void mockATCommand(const char *line) {
+  if (line[0] == 'A') {
+    if (strstr(line, "AT+CWJAP_DEF")) setWifi(line);
+
+    if (strstr(line, "AT+CIPSEND"))  Serial << ">" << endl; 
+    else                             Serial << "OK" << endl;
   }
 }
