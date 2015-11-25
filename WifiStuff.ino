@@ -1,14 +1,22 @@
-int wifiWaitForConnect() {
-  Serial << "Wait for Auto-connect 10 sec" << endl;
-  for (int i=10; i > 0; i++) {
-    if (WiFi.status() == WL_CONNECTED) {
-      Serial << endl;
-      return 1;
-    }
-    Serial << ".";
+IPAddress ip = WiFi.localIP();
+
+void handleWifi() {
+  if (ip == WiFi.localIP()) return;
+  else if (WiFi.status() == WL_CONNECTED) {
+    Serial << "IP address: " << WiFi.localIP() << endl << "GOT IP" << endl; 
   }
-  Serial <<endl;
-  return 0;
+}
+
+void connectToWifi(const char *s1, const char *s2, const char *s3) {
+  if (strstr(s1, "SAP-Guest")) {
+    if (s2 && s3) {
+      setSSIDPass("SAP-Guest", "aaaa");
+      for (int i=0; i<10 && WiFi.status() != WL_CONNECTED; i--) handleWifi();
+      setSAPGuestCredentials(s2, s3);
+    }
+  } else {
+    setSSIDPass(s1, s2);
+  }
 }
 
 int wifiConnectToStoredSSID() {
@@ -19,27 +27,15 @@ int wifiConnectToStoredSSID() {
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
-  return waitForConnect();
 }
 
-
-void startWifi(boolean doAutoconnect) {
-  int res = 0;
-  
-  if (doAutoConnect) res = wifiWaitForConnect();
-  if (!res)          res = wifiConnectToStoredSSD();
-
-  if (!res) Serial << "Cannot connect to Wifi ! " << WiFi.status() << endl;
-  else      Serial << "IP address: " << WiFi.localIP() << endl << "GOT IP" << endl;  
-}
-
-void setSSIDPass(char *ssid, char *pass) {
+void setSSIDPass(const char *ssid, const char *pass) {
   char tmp[30];
   strcpy(tmp, ssid);
   EEPROM.put(EE_WIFI_SSID_30B, tmp);
   strcpy(tmp, pass);
   EEPROM.put(EE_WIFI_PASS_30B, tmp);
   EEPROM.commit();
-  startWifi(false);
+  wifiConnectToStoredSSID();
 }
 

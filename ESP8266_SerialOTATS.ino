@@ -18,12 +18,13 @@ void setup() {
   Serial.begin(9600);
   EEPROM.begin(1024);
   Serial << endl << "ready" << endl;
-  startWifi();
+  //startWifi();
 }
 
 
 boolean startedOTA = false;
 void loop() {
+  handleWifi();
   handleOTA();
   if (!startedOTA) {
     processUserInput();
