@@ -44,11 +44,21 @@ int handleCommand() {
   return 0;
 }
 
+
+void getTS(const char* line) {
+  sendHTTP("api.thingspeak.com", "GET", line + 4, NULL, NULL, false, false);
+}
+
+void sendTS() {
+  sendHTTP("api.thingspeak.com", "GET", "/update?key=8U1HL3MF593FILFK&field1=456", NULL, NULL, false, false);
+}
+
 int setWifi(const char* p) {
   char s1[20], s2[20], s3[20];
   p = extractStringFromQuotes(p, s1);
   p = extractStringFromQuotes(p, s2);
   p = extractStringFromQuotes(p, s3);
+  Serial << "setWifi" << s1 << s2 << s3 << endl;
 
   connectToWifi(s1, s2, s3);
   return 0;

@@ -30,7 +30,7 @@ WiFiClient *createHTTPClient(const char* host, boolean secure) {
 
 void sendHTTPRequest(WiFiClient *client, const char* host, const char* method, const char *url, const char* headers, const char* postData, boolean sendHeaders) {
   String rq = buildRequestHeader(host, method, url, headers, postData, sendHeaders);
-  Serial << "Requesting: " << endl << rq << endl;
+  Serial << "Requesting [" << endl << rq << "]" << endl;
   client->print(rq);
   if (postData) client->print(postData);
 }
@@ -40,7 +40,7 @@ String buildRequestHeader(const char* host, const char* method, const char *url,
   if (sendHeaders)
      rq += String("Host: ") + host + "\r\n" + 
            (postData? (String("Content-Length: ") + strlen(postData) + "\r\n") : "") +
-           (headers ? headers : "\r\n");
+           (headers ? headers : "");
    rq += "\r\n";
    return rq;
 }

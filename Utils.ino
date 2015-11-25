@@ -12,3 +12,11 @@ char *extractStringFromQuotes(const char* src, char *dest) {
   return p2 + 1;
 }
 
+
+void storeToEE(int address, const char *str) {
+  char tmp[30];
+  strcpy(tmp, str);
+  EEPROM.put(address, tmp);
+  EEPROM.commit();
+}
+
