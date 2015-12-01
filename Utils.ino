@@ -14,9 +14,9 @@ char *extractStringFromQuotes(const char* src, char *dest) {
 
 
 void storeToEE(int address, const char *str) {
-  char tmp[30];
-  strcpy(tmp, str);
-  EEPROM.put(address, tmp);
+  //char tmp[30];
+  //strcpy(tmp, str);
+  while (*str)  EEPROM.update(address++, *(str++));
   EEPROM.commit();
 }
 

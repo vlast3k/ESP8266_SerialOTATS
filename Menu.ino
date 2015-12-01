@@ -1,4 +1,4 @@
-#define LINE_LEN 120
+#define LINE_LEN 200
 char line[LINE_LEN];
 
 void processUserInput() {

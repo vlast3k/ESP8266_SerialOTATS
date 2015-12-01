@@ -12,6 +12,7 @@ void setSAPAuth(const char *);
 #define EE_WIFI_SSID_30B 0
 #define EE_WIFI_P1_30B 30
 #define EE_WIFI_P2_30B 60
+#define EE_IOT_HOST
 #define EE_LAST 90
 void setup() {
   Serial.begin(9600);
