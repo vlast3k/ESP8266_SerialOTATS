@@ -1,4 +1,4 @@
-#define LINE_LEN 100
+#define LINE_LEN 120
 char line[LINE_LEN];
 
 void processUserInput() {
@@ -6,14 +6,11 @@ void processUserInput() {
   if (!Serial.available()) return;
   
   Serial.setTimeout(30000);
-  while (readLine(30000) >= 0) {
+  if (readLine(30000) >= 0) {
     Serial.flush();
-    if (!handleCommand()) {
-      Serial << endl << F("Exiting menu") << endl;
-      return;
-    }
+    handleCommand();
+   // Serial << endl << F("OK") << endl;
   }
-  Serial << F("Menu Timed out") << endl;
 }
 
 byte readLine(int timeout) {
@@ -40,13 +37,14 @@ int handleCommand() {
   else if (line[0] == 'S') httpAuthSAP();
   else if (line[0] == 'C') checkSAPAuth();
   else if (line[0] == 'G') getTS(line);
+  else if (strstr(line, "hcpiot")) sendHCPIOT(line);
   else if (strstr(line, "wifi")) setWifi(line);
   return 0;
 }
 
-
+char atCIPSTART_IP[20];
 void getTS(const char* line) {
-  sendHTTP("api.thingspeak.com", "GET", line + 4, NULL, NULL, false, false);
+  sendHTTP(atCIPSTART_IP, "GET", line + 4, NULL, NULL, false, false);
 }
 
 void sendTS() {
@@ -64,11 +62,36 @@ int setWifi(const char* p) {
   return 0;
 }
 
+
+void atCIPSTART(const char *p) {
+  p = extractStringFromQuotes(p, atCIPSTART_IP);
+  p = extractStringFromQuotes(p, atCIPSTART_IP);  
+}
+
 void mockATCommand(const char *line) {
   if (line[0] == 'A') {
     if (strstr(line, "AT+CWJAP_DEF")) setWifi(line);
-
+    if (strstr(line, "AT+CIPSTART")) atCIPSTART(line);
+    
     if (strstr(line, "AT+CIPSEND"))  Serial << ">" << endl; 
     else                             Serial << "OK" << endl;
   }
 }
+
+void sendHCPIOT(const char *line) {
+  //POST https://iotmmsi024148trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/c5c73d69-6a19-4c7d-9da3-b32198ba71f9/2023a0e66f76d20f47d7/sync?co2=34
+  // host: iotmmsi024148trial.hanatrial.ondemand.com
+  // deviceId: c5c73d69-6a19-4c7d-9da3-b32198ba71f9
+  // messageId: 2023a0e66f76d20f47d7
+  // variable name: co2
+  // authorization token: 46de4fc404221b32054a8405f602fd
+  // 
+  //Authorization: Bearer 46de4fc404221b32054a8405f602fd
+//h iotmmsi024148trial.hanatrial.ondemand.com
+//d c5c73d69-6a19-4c7d-9da3-b32198ba71f9
+//m 2023a0e66f76d20f47d7
+//v co2
+//t 46de4fc404221b32054a8405f602fd
+  
+}
+
