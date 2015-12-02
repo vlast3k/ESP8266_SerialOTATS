@@ -9,11 +9,21 @@
 #include <algorithm>    // std::min
 
 void setSAPAuth(const char *);
+char *extractStringFromQuotes(const char* src, char *dest, int destSize=19) ;
 #define EE_WIFI_SSID_30B 0
 #define EE_WIFI_P1_30B 30
 #define EE_WIFI_P2_30B 60
-#define EE_IOT_HOST
-#define EE_LAST 90
+#define EE_IOT_HOST_60B 90
+#define EE_IOT_PATH_140B 150
+#define EE_IOT_TOKN_40B 290
+//#define EE_LAST 330
+
+//h iotmmsi024148trial.hanatrial.ondemand.com
+//d c5c73d69-6a19-4c7d-9da3-b32198ba71f9
+//m 2023a0e66f76d20f47d7
+//v co2
+//t 46de4fc404221b32054a8405f602fd
+
 void setup() {
   Serial.begin(9600);
   EEPROM.begin(1024);

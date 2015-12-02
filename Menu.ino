@@ -37,7 +37,9 @@ int handleCommand() {
   else if (line[0] == 'S') httpAuthSAP();
   else if (line[0] == 'C') checkSAPAuth();
   else if (line[0] == 'G') getTS(line);
-  else if (strstr(line, "hcpiot")) sendHCPIOT(line);
+  else if (strstr(line, "cfgiot")) cfgHCPIOT(line);
+  else if (strstr(line, "sndiot")) sndHCPIOT(line);
+  else if (strstr(line, "smp")) sndSimple();
   else if (strstr(line, "wifi")) setWifi(line);
   return 0;
 }
@@ -53,9 +55,9 @@ void sendTS() {
 
 int setWifi(const char* p) {
   char s1[20], s2[20], s3[20];
-  p = extractStringFromQuotes(p, s1);
-  p = extractStringFromQuotes(p, s2);
-  p = extractStringFromQuotes(p, s3);
+  p = extractStringFromQuotes(p, s1, 20);
+  p = extractStringFromQuotes(p, s2, 20);
+  p = extractStringFromQuotes(p, s3, 20);
   Serial << "setWifi" << s1 << s2 << s3 << endl;
 
   connectToWifi(s1, s2, s3);
@@ -64,8 +66,8 @@ int setWifi(const char* p) {
 
 
 void atCIPSTART(const char *p) {
-  p = extractStringFromQuotes(p, atCIPSTART_IP);
-  p = extractStringFromQuotes(p, atCIPSTART_IP);  
+  p = extractStringFromQuotes(p, atCIPSTART_IP, 20);
+  p = extractStringFromQuotes(p, atCIPSTART_IP, 20);  
 }
 
 void mockATCommand(const char *line) {
@@ -78,20 +80,51 @@ void mockATCommand(const char *line) {
   }
 }
 
-void sendHCPIOT(const char *line) {
+void cfgHCPIOT(const char *p) {
   //POST https://iotmmsi024148trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/c5c73d69-6a19-4c7d-9da3-b32198ba71f9/2023a0e66f76d20f47d7/sync?co2=34
   // host: iotmmsi024148trial.hanatrial.ondemand.com
   // deviceId: c5c73d69-6a19-4c7d-9da3-b32198ba71f9
   // messageId: 2023a0e66f76d20f47d7
   // variable name: co2
-  // authorization token: 46de4fc404221b32054a8405f602fd
-  // 
-  //Authorization: Bearer 46de4fc404221b32054a8405f602fd
-//h iotmmsi024148trial.hanatrial.ondemand.com
-//d c5c73d69-6a19-4c7d-9da3-b32198ba71f9
-//m 2023a0e66f76d20f47d7
-//v co2
-//t 46de4fc404221b32054a8405f602fd
+  
+  // Authorization: Bearer 46de4fc404221b32054a8405f602fd
+
+  char buf[140], devId[40], msgId[25], varName[20];
+  p = extractStringFromQuotes(p, buf, sizeof(buf)); // host
+  storeToEE(EE_IOT_HOST_60B, buf);     //host
+  Serial << "IOT Host: " << buf << endl;
+  
+  p = extractStringFromQuotes(p, devId, sizeof(devId)); 
+  p = extractStringFromQuotes(p, msgId, sizeof(msgId)); 
+  p = extractStringFromQuotes(p, varName, sizeof(varName)); 
+  sprintf(buf, "/com.sap.iotservices.mms/v1/api/http/data/%s/%s/sync?%s=", devId, msgId, varName);
+  storeToEE(EE_IOT_PATH_140B, buf); // path
+  Serial << "IOT Path: " << buf << endl;
+  
+  p = extractStringFromQuotes(p, buf, sizeof(buf)); // token
+  storeToEE(EE_IOT_TOKN_40B, buf);     // token
+  Serial << "IOT OAuth Token: " << buf << endl;
+  heap("");
+}
+
+void sndHCPIOT(const char *line) {
+  char host[60], path[140], token[40];
+  EEPROM.get(EE_IOT_HOST_60B, host);
+  EEPROM.get(EE_IOT_PATH_140B, path);
+  EEPROM.get(EE_IOT_TOKN_40B, token);
+  Serial << "hcpiot" << endl;
+  String headers = String("Authorization: Bearer ") + token + "\nContent-Type: application/json;charset=UTF-8\n";
+  sprintf(path, "%s%s", path, &line[7]);
+  int rc = sendHTTP(host, "POST", path, headers.c_str(), NULL, true, true);
+  //ESP.getFreeHeap()
+  Serial << "IOT rc: " << rc;
+  heap("");
+}
+
+void sndSimple() {
+  String headers = String("Authorization: Bearer 46de4fc404221b32054a8405f602fd\nContent-Type: application/json;charset=UTF-8\n");
+  int rc = sendHTTP("iotmmsi024148trial.hanatrial.ondemand.com", "POST", "/com.sap.iotservices.mms/v1/api/http/data/c5c73d69-6a19-4c7d-9da3-b32198ba71f9/2023a0e66f76d20f47d7/sync?co2=34", headers.c_str(), NULL, true, true);
+  
   
 }
 

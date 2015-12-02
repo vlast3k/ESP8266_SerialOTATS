@@ -1,14 +1,22 @@
 boolean traceHttp = true;
 
 int sendHTTP(const char* host, const char* method, const char *url, const char* headers, const char* postData, boolean secure, boolean sendHeaders) {
+  heap("before client");
   WiFiClient *client = createHTTPClient(host, secure);
+  heap("after client");
   if (!client) return -1;
   sendHTTPRequest(client, host, method, url, headers, postData, sendHeaders);      
   if (waitForResponse(client, 3000)) {
     int responseCode = getResponseCode(client);
+  heap("before delete");
+  delete client;
+  heap("after delete");
     Serial << endl << "CLOSED" << endl;
     return responseCode;
   } else {
+   heap("before delete");
+   delete client;
+    heap("after delete");
     Serial << "Timeout !" << endl;
     return -2;
   }
@@ -30,6 +38,7 @@ WiFiClient *createHTTPClient(const char* host, boolean secure) {
 
 void sendHTTPRequest(WiFiClient *client, const char* host, const char* method, const char *url, const char* headers, const char* postData, boolean sendHeaders) {
   String rq = buildRequestHeader(host, method, url, headers, postData, sendHeaders);
+  //  heap("after build request");
   Serial << "Requesting [" << endl << rq << "]" << endl;
   client->print(rq);
   if (postData) client->print(postData);
