@@ -1,3 +1,12 @@
+void on302() {
+  char str[30];
+  EEPROM.get(EE_WIFI_SSID_30B, str);
+  if (strstr(str, "SAP-Guest") == 0) {
+    checkSAPAuth();
+    sendPing();
+  }
+}
+
 int checkSAPAuth() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial << "Cannot set SAP Guest credentials. No WiFi!" << endl;

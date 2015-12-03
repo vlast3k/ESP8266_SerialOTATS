@@ -1,22 +1,19 @@
 boolean traceHttp = true;
 
+
+
 int sendHTTP(const char* host, const char* method, const char *url, const char* headers, const char* postData, boolean secure, boolean sendHeaders) {
-  heap("before client");
   WiFiClient *client = createHTTPClient(host, secure);
-  heap("after client");
   if (!client) return -1;
   sendHTTPRequest(client, host, method, url, headers, postData, sendHeaders);      
   if (waitForResponse(client, 3000)) {
     int responseCode = getResponseCode(client);
-  heap("before delete");
-  delete client;
-  heap("after delete");
+     if (responseCode == 302) on302();
+    delete client;
     Serial << endl << "CLOSED" << endl;
     return responseCode;
   } else {
-   heap("before delete");
-   delete client;
-    heap("after delete");
+    delete client;
     Serial << "Timeout !" << endl;
     return -2;
   }
