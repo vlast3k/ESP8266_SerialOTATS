@@ -26,6 +26,7 @@ char *extractStringFromQuotes(const char* src, char *dest, int destSize=19) ;
 
 void setup() {
   Serial.begin(9600);
+  Serial << "vAir WiFi module v1.0" << endl;
   EEPROM.begin(1024);
   Serial << endl << "ready" << endl;
   //startWifi();

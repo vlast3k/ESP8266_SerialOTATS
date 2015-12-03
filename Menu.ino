@@ -41,6 +41,7 @@ int handleCommand() {
   else if (strstr(line, "sndiot")) sndHCPIOT(line);
   else if (strstr(line, "smp")) sndSimple();
   else if (strstr(line, "wifi")) setWifi(line);
+  else if (strstr(line, "scan")) wifiScanNetworks();
   return 0;
 }
 
