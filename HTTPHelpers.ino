@@ -8,8 +8,8 @@ int sendHTTP(const char* host, const char* method, const char *url, const char* 
   sendHTTPRequest(client, host, method, url, headers, postData, sendHeaders);      
   if (waitForResponse(client, 3000)) {
     int responseCode = getResponseCode(client);
-     if (responseCode == 302) on302();
     delete client;
+    if (responseCode == 302) on302();
     Serial << endl << "CLOSED" << endl;
     return responseCode;
   } else {
@@ -55,7 +55,8 @@ boolean waitForResponse(WiFiClient *client, int timeout) {
   Serial << "Waiting Respomse " << endl;
   int t = 0;
   while (!client->available()) {
-    if (t += 10 > timeout) break;
+    Serial << ".";
+    if ((t += 10) > timeout) break;
     delay(10);
   }
   Serial << "Response time: " << t << endl ;  
