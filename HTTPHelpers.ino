@@ -55,7 +55,6 @@ boolean waitForResponse(WiFiClient *client, int timeout) {
   Serial << "Waiting Respomse " << endl;
   int t = 0;
   while (!client->available()) {
-    Serial << ".";
     if ((t += 10) > timeout) break;
     delay(10);
   }
