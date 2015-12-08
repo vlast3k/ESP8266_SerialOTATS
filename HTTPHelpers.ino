@@ -9,7 +9,6 @@ int sendHTTP(const char* host, const char* method, const char *url, const char* 
   if (waitForResponse(client, 3000)) {
     int responseCode = getResponseCode(client);
     delete client;
-    if (responseCode == 302) on302();
     Serial << endl << "CLOSED" << endl;
     return responseCode;
   } else {

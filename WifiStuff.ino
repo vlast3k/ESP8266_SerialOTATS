@@ -4,6 +4,7 @@ void handleWifi() {
   if (ip == WiFi.localIP()) return;
   else if (WiFi.status() == WL_CONNECTED) {
     ip = WiFi.localIP();
+    checkSAPAuth();
     Serial << "IP address: " << WiFi.localIP() << endl << "GOT IP" << endl; 
   } 
   ip = WiFi.localIP();
@@ -21,10 +22,10 @@ void connectToWifi(const char *s1, const char *s2, const char *s3) {
     delay(1000);
   }
   handleWifi();
-  if (strstr(s1, "SAP-Guest")) {
-
-    checkSAPAuth();
-  } 
+//  if (strstr(s1, "SAP-Guest")) {
+//
+//    checkSAPAuth();
+//  } 
 }
 
 int wifiConnectToStoredSSID() {
