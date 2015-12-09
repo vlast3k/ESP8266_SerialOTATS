@@ -8,7 +8,7 @@ void on302() {
 }
 
 int checkSAPAuth() {
-  if (strstr(WiFi.SSID().c_str(), "SAP-Guest") != 0) {
+  if (strstr(WiFi.SSID().c_str(), "SAP-Guest") == 0) {
     Serial << "Network is not SAP-Guest : "<< WiFi.SSID() << endl;
     return -1;
   }
