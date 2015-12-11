@@ -7,6 +7,8 @@
 #include <EEPROM.h>
 #include <Math.h>
 #include <algorithm>    // std::min
+#include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
 
 void setSAPAuth(const char *);
 char *extractStringFromQuotes(const char* src, char *dest, int destSize=19) ;
@@ -26,7 +28,7 @@ char *extractStringFromQuotes(const char* src, char *dest, int destSize=19) ;
 
 void setup() {
   Serial.begin(9600);
-  Serial << "vAir WiFi module v1.2" << endl;
+  Serial << "vAir WiFi module v1.3" << endl;
   EEPROM.begin(1024);
   Serial << endl << "ready" << endl;
   //startWifi();

@@ -30,8 +30,7 @@ byte readLine(int timeout) {
 
 int handleCommand() {
   Serial << "Received command: " << line << endl;
-  if      (line[0] == 'o') startOTA();
-  else if (line[0] == 't') sendTS();
+  if (line[0] == 't') sendTS();
   else if (line[0] == 'p') sendPing();
   else if (line[0] == 'A') mockATCommand(line);
   else if (line[0] == 'S') httpAuthSAP();
@@ -39,15 +38,24 @@ int handleCommand() {
   else if (line[0] == 'G') getTS(line);
   else if (strstr(line, "cfgiot")) cfgHCPIOT(line);
   else if (strstr(line, "sndiot")) sndHCPIOT(line);
+  else if (strstr(line, "smp2")) sndSimple2();
   else if (strstr(line, "smp")) sndSimple();
   else if (strstr(line, "wifi")) setWifi(line);
   else if (strstr(line, "scan")) wifiScanNetworks();
+  else if (strstr(line, "otah")) doHttpUpdate();
+  else if (line[0] == 'o') startOTA();
+  else if (strstr(line, "ubi")) testUBI();
   return 0;
 }
 
 char atCIPSTART_IP[20];
 void getTS(const char* line) {
   sendHTTP(atCIPSTART_IP, "GET", line + 4, NULL, NULL, false, false);
+}
+
+void testUBI() {
+  sendHTTP("50.23.124.66", "GET", "/api/postvalue/?token=Cg5W22qmWFcsMqsALMik04VtEF7PYA&variable=565965867625420c74ec604b&value=456", NULL, NULL, false, false);
+  
 }
 
 void sendTS() {
@@ -125,7 +133,10 @@ void sndHCPIOT(const char *line) {
 void sndSimple() {
   String headers = String("Authorization: Bearer 46de4fc404221b32054a8405f602fd\nContent-Type: application/json;charset=UTF-8\n");
   int rc = sendHTTP("iotmmsi024148trial.hanatrial.ondemand.com", "POST", "/com.sap.iotservices.mms/v1/api/http/data/c5c73d69-6a19-4c7d-9da3-b32198ba71f9/2023a0e66f76d20f47d7/sync?co2=34", headers.c_str(), NULL, true, true);
-  
-  
+}
+
+void sndSimple2() {
+  String headers = String("Authorization: Bearer 46de4fc404221b32054a8405f602fd\nContent-Type: application/json;charset=UTF-8\n");
+  int rc = sendHTTP2("iotmmsi024148trial.hanatrial.ondemand.com", "POST", "/com.sap.iotservices.mms/v1/api/http/data/c5c73d69-6a19-4c7d-9da3-b32198ba71f9/2023a0e66f76d20f47d7/sync?co2=34", headers.c_str(), NULL, true, true);
 }
 

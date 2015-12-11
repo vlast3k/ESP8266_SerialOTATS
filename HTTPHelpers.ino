@@ -3,6 +3,26 @@ boolean traceHttp = true;
 
 
 int sendHTTP(const char* host, const char* method, const char *url, const char* headers, const char* postData, boolean secure, boolean sendHeaders) {
+  HTTPClient http;
+  if (secure) {
+    http.begin(String("https://") + host + url);
+  } else {
+    http.begin(host, 80, url);
+    
+  }
+
+  int rc = http.sendRequest(method, (uint8_t*)postData, postData ? strlen(postData) : 0);
+  Serial << "Response Code: " << rc << endl;
+  if (rc > 0) {
+    Serial << "Payload: [" << http.getString() << "]" << endl;
+    Serial << "CLOSED" << endl; // for compatibility with AT FW
+  } else {
+    Serial << "Failed" << endl;
+  }
+  return rc;
+}
+
+int sendHTTP2(const char* host, const char* method, const char *url, const char* headers, const char* postData, boolean secure, boolean sendHeaders) {
   WiFiClient *client = createHTTPClient(host, secure);
   if (!client) return -1;
   sendHTTPRequest(client, host, method, url, headers, postData, sendHeaders);      
