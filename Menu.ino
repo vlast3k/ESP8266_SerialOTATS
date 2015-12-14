@@ -30,8 +30,7 @@ byte readLine(int timeout) {
 
 int handleCommand() {
   Serial << "Received command: " << line << endl;
-  if      (line[0] == 'o') startOTA();
-  else if (line[0] == 't') sendTS();
+  if (line[0] == 't') sendTS();
   else if (line[0] == 'p') sendPing();
   else if (line[0] == 'A') mockATCommand(line);
   else if (line[0] == 'S') httpAuthSAP();
@@ -39,19 +38,33 @@ int handleCommand() {
   else if (line[0] == 'G') getTS(line);
   else if (strstr(line, "cfgiot")) cfgHCPIOT(line);
   else if (strstr(line, "sndiot")) sndHCPIOT(line);
+  //else if (strstr(line, "smp2")) sndSimple2();
   else if (strstr(line, "smp")) sndSimple();
   else if (strstr(line, "wifi")) setWifi(line);
   else if (strstr(line, "scan")) wifiScanNetworks();
+  else if (strstr(line, "otah")) doHttpUpdate();
+  else if (line[0] == 'o') startOTA();
+  else if (strstr(line, "ubi")) testUBI();
   return 0;
 }
 
 char atCIPSTART_IP[20];
 void getTS(const char* line) {
-  sendHTTP(atCIPSTART_IP, "GET", line + 4, NULL, NULL, false, false);
+  HTTPClient http;
+  http.begin(HTTP_STR  + atCIPSTART_IP + (line + 4));
+  processResponseCodeATFW(&http, http.GET());
+}
+
+void testUBI() {
+  HTTPClient http;
+  http.begin("http://50.23.124.66/api/postvalue/?token=Cg5W22qmWFcsMqsALMik04VtEF7PYA&variable=565965867625420c74ec604b&value=456");
+  processResponseCodeATFW(&http, http.GET());  
 }
 
 void sendTS() {
-  sendHTTP("api.thingspeak.com", "GET", "/update?key=8U1HL3MF593FILFK&field1=456", NULL, NULL, false, false);
+  HTTPClient http;
+  http.begin("http://api.thingspeak.com/update?key=8U1HL3MF593FILFK&field1=456");
+  processResponseCodeATFW(&http, http.GET());
 }
 
 int setWifi(const char* p) {
@@ -114,18 +127,26 @@ void sndHCPIOT(const char *line) {
   EEPROM.get(EE_IOT_PATH_140B, path);
   EEPROM.get(EE_IOT_TOKN_40B, token);
   Serial << "hcpiot" << endl;
-  String headers = String("Authorization: Bearer ") + token + "\nContent-Type: application/json;charset=UTF-8\n";
   sprintf(path, "%s%s", path, &line[7]);
-  int rc = sendHTTP(host, "POST", path, headers.c_str(), NULL, true, true);
-  //ESP.getFreeHeap()
+  
+  HTTPClient http;
+  http.begin(HTTPS_STR + host + path);
+  addHCPIOTHeaders(&http, token);
+  int rc = processResponseCodeATFW(&http, http.POST(""));
   Serial << "IOT rc: " << rc;
   heap("");
 }
 
-void sndSimple() {
-  String headers = String("Authorization: Bearer 46de4fc404221b32054a8405f602fd\nContent-Type: application/json;charset=UTF-8\n");
-  int rc = sendHTTP("iotmmsi024148trial.hanatrial.ondemand.com", "POST", "/com.sap.iotservices.mms/v1/api/http/data/c5c73d69-6a19-4c7d-9da3-b32198ba71f9/2023a0e66f76d20f47d7/sync?co2=34", headers.c_str(), NULL, true, true);
-  
-  
+void addHCPIOTHeaders(HTTPClient *http, const char *token) {
+  http->addHeader("Content-Type",  "application/json;charset=UTF-8");
+  http->addHeader("Authorization", String("Bearer ") + token);  
 }
+
+void sndSimple() {
+  HTTPClient http;
+  http.begin("https://iotmmsi024148trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/c5c73d69-6a19-4c7d-9da3-b32198ba71f9/2023a0e66f76d20f47d7/sync?co2=34");
+  addHCPIOTHeaders(&http, "be4e6b1381f6989b195a402420399a8");
+  processResponseCodeATFW(&http, http.POST(""));
+}
+
 

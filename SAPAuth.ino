@@ -44,18 +44,23 @@ char *sapAuthPreparePostData(char *postData) {
   return postData;
 }
 
-String sapAuthHeaders =  String("Content-Type: application/x-www-form-urlencoded\n")
-                        + "User-Agent: Mozilla/5.0\n"
-                        + "Referer: https://emea-guest.wlan.sap.com/guest/sap_guest_register_login.php?_browser=1\n";
 
 
 int httpAuthSAP() {
   char postData[100];
   if ( ! sapAuthPreparePostData(postData) ) return -1;
-  int rc = sendHTTP("securelogin.wlan.sap.com", "POST", "/cgi-bin/login", sapAuthHeaders.c_str(), postData, true, true);
-  Serial << "SAP Auth Response is: " << rc << endl;
-  if (rc == -1 || rc == 200) return 1;
-  else return -1;
+//  char sapAuthHeaders* = "\"Content-Type\", \"application/x-www-form-urlencoded\",\"Referer\" \"https://emea-guest.wlan.sap.com/guest/sap_guest_register_login.php?_browser=1\"";    
+  HTTPClient http;
+  http.begin("https://securelogin.wlan.sap.com/cgi-bin/login");
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.addHeader("Referer", "https://emea-guest.wlan.sap.com/guest/sap_guest_register_login.php?_browser=1");
+  int rc = http.POST((uint8_t*)postData, strlen(postData));
+  if (rc < 0 || rc == 200) return 1;
+  else return -1; 
+//  int rc = sendHTTP("securelogin.wlan.sap.com", "POST", "/cgi-bin/login", sapAuthHeaders, postData, true, true);
+//  Serial << "SAP Auth Response is: " << rc << endl;
+//  if (rc == -1 || rc == 200) return 1;
+//  else return -1;
 }
   // rc == -1 - timeout connect = connection exists
   // rc == 302 - bad user pass
@@ -63,7 +68,9 @@ int httpAuthSAP() {
   
 
 int sendPing() {
-  return sendHTTP("ping.eu", "HEAD", "/", NULL, NULL, false, true);
+  HTTPClient http;
+  http.begin("http://ping.eu/");
+  return processResponseCodeATFW(&http, http.sendRequest("HEAD", (uint8_t*)"", 0));
 
   //302 - no connection
   //200 - connection ok

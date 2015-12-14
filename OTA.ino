@@ -1,7 +1,26 @@
 
+void doHttpUpdate() {
+  Serial << "Starting Web update" << endl;
+  t_httpUpdate_return ret = ESPhttpUpdate.update("https://raw.githubusercontent.com/vlast3k/ESP8266_SerialOTATS/master/fw/latest.bin");
+  switch(ret) {
+    case HTTP_UPDATE_FAILED:
+      Serial.println("HTTP_UPDATE_FAILED");
+      break;
+
+    case HTTP_UPDATE_NO_UPDATES:
+      Serial.println("HTTP_UPDATE_NO_UPDATES");
+      break;
+
+    case HTTP_UPDATE_OK:
+      Serial.println("HTTP_UPDATE_OK");
+      break;
+  }
+}
+
 void handleOTA() {
   if (startedOTA) ArduinoOTA.handle();
 }
+
 void startOTA() {
   Serial << "Starting OTA..." << endl;
   // Port defaults to 8266
