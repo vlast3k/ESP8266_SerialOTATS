@@ -33,6 +33,12 @@ void setup() {
   Serial << endl << "ready" << endl;
   //startWifi();
   Serial << "Waiting for auto-connect" << endl;
+    WiFi.begin("vladiHome", "0888414447");
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
 }
 
 
