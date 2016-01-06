@@ -36,8 +36,9 @@ int handleCommand() {
   else if (line[0] == 'S') httpAuthSAP();
   else if (line[0] == 'C') checkSAPAuth();
   else if (line[0] == 'G') getTS(line);
+  else if (strstr(line, "cfggen")) cfgGENIOT(line);
   else if (strstr(line, "cfgiot")) cfgHCPIOT(line);
-  else if (strstr(line, "sndiot")) sndHCPIOT(line);
+  else if (strstr(line, "sndiot")) sndIOT(line);
   //else if (strstr(line, "smp2")) sndSimple2();
   else if (strstr(line, "smp")) sndSimple();
   else if (strstr(line, "wifi")) setWifi(line);
@@ -94,6 +95,18 @@ void mockATCommand(const char *line) {
   }
 }
 
+void cfgGENIOT(const char *p) {
+  char genurl[140] = "";
+  if (!p[6]) {
+    Serial << "Cleared Generic URL" << endl;    
+  } else {
+    strncpy(genurl, p+7, sizeof(genurl)-1);
+    Serial << "Stored Generic URL: " << genurl << endl;
+  }
+  storeToEE(EE_GENIOT_PATH_140B, genurl); // path
+  Serial << "DONE" << endl;
+}
+
 void cfgHCPIOT(const char *p) {
   //POST https://iotmmsi024148trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/c5c73d69-6a19-4c7d-9da3-b32198ba71f9/2023a0e66f76d20f47d7/sync?co2=34
   // host: iotmmsi024148trial.hanatrial.ondemand.com
@@ -119,6 +132,32 @@ void cfgHCPIOT(const char *p) {
   storeToEE(EE_IOT_TOKN_40B, buf);     // token
   Serial << "IOT OAuth Token: " << buf << endl;
   heap("");
+}
+
+void sndIOT(const char *line) {
+  char path[140];
+  EEPROM.get(EE_IOT_PATH_140B, path);
+  if (strlen(path) > 0) {
+    sndHCPIOT(line);    
+  } 
+  
+  EEPROM.get(EE_GENIOT_PATH_140B, path);
+  if (strlen(path) > 0) {
+    sndGENIOT(line);
+  } 
+}
+
+void sndGENIOT(const char *line) {
+  char str[140];
+  EEPROM.get(EE_GENIOT_PATH_140B, str);
+  Serial << "geniot" << endl;
+  sprintf(str, str, &line[7]);
+  
+  HTTPClient http;
+  http.begin(str);
+  //addHCPIOTHeaders(&http, token);
+  int rc = processResponseCodeATFW(&http, http.GET());
+  Serial << "GEN rc: " << rc;
 }
 
 void sndHCPIOT(const char *line) {

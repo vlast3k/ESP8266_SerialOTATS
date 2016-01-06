@@ -18,7 +18,8 @@ char *extractStringFromQuotes(const char* src, char *dest, int destSize=19) ;
 #define EE_IOT_HOST_60B 90
 #define EE_IOT_PATH_140B 150
 #define EE_IOT_TOKN_40B 290
-//#define EE_LAST 330
+#define EE_GENIOT_PATH_140B 330
+//#define EE_LAST 470
 
 //h iotmmsi024148trial.hanatrial.ondemand.com
 //d c5c73d69-6a19-4c7d-9da3-b32198ba71f9
@@ -28,7 +29,7 @@ char *extractStringFromQuotes(const char* src, char *dest, int destSize=19) ;
 
 void setup() {
   Serial.begin(9600);
-  Serial << "vAir WiFi module v1.3" << endl;
+  Serial << "vAir WiFi module v1.4" << endl;
   EEPROM.begin(1024);
   Serial << endl << "ready" << endl;
   //startWifi();
