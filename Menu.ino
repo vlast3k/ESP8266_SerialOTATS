@@ -137,24 +137,25 @@ void cfgHCPIOT(const char *p) {
 void sndIOT(const char *line) {
   char path[140];
   EEPROM.get(EE_IOT_PATH_140B, path);
-  if (strlen(path) > 0) {
+  if (path[0] && path[0] != 255) {
     sndHCPIOT(line);    
   } 
   
   EEPROM.get(EE_GENIOT_PATH_140B, path);
-  if (strlen(path) > 0) {
+  if (path[0] && path[0] != 255) {
     sndGENIOT(line);
   } 
 }
 
 void sndGENIOT(const char *line) {
-  char str[140];
+  char str[140], str2[150];
   EEPROM.get(EE_GENIOT_PATH_140B, str);
-  Serial << "geniot" << endl;
-  sprintf(str, str, &line[7]);
+  Serial << "geniot: " << str << endl;
+  sprintf(str2, str, &line[7]);
+  Serial << "geniot: " << str2 << endl;
   
   HTTPClient http;
-  http.begin(str);
+  http.begin(str2);
   //addHCPIOTHeaders(&http, token);
   int rc = processResponseCodeATFW(&http, http.GET());
   Serial << "GEN rc: " << rc;
@@ -165,8 +166,9 @@ void sndHCPIOT(const char *line) {
   EEPROM.get(EE_IOT_HOST_60B, host);
   EEPROM.get(EE_IOT_PATH_140B, path);
   EEPROM.get(EE_IOT_TOKN_40B, token);
-  Serial << "hcpiot" << endl;
+
   sprintf(path, "%s%s", path, &line[7]);
+  Serial << "hcpiot: " << path << endl;
   
   HTTPClient http;
   http.begin(HTTPS_STR + host + path);

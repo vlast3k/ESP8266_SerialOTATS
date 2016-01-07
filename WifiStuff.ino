@@ -1,7 +1,7 @@
  IPAddress ip = WiFi.localIP();
 
 void handleWifi() {
-  Serial << "ip = " << ip  << ", localip:" << WiFi.localIP() << endl;
+  //Serial << "ip = " << ip  << ", localip:" << WiFi.localIP() << endl;
   if (ip == WiFi.localIP()) return;
   else if (WiFi.status() == WL_CONNECTED) {
     ip = WiFi.localIP();
