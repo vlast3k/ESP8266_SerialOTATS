@@ -43,8 +43,8 @@ int handleCommand() {
   else if (strstr(line, "smp")) sndSimple();
   else if (strstr(line, "wifi")) setWifi(line);
   else if (strstr(line, "scan")) wifiScanNetworks();
-  else if (strstr(line, "otah")) doHttpUpdate(1);
   else if (strstr(line, "otahtest")) doHttpUpdate(2);
+  else if (strstr(line, "otah")) doHttpUpdate(1);
   else if (line[0] == 'o') startOTA();
   else if (strstr(line, "ubi")) testUBI();
   return 0;
