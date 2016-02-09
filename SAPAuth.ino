@@ -17,6 +17,7 @@ int checkSAPAuth() {
     Serial << "Cannot set SAP Guest credentials. No WiFi!" << endl;
     return -1;
   }
+  httpAuthSAP();
   if (sendPing() == 302) {
     if (httpAuthSAP() == 302) {
       Serial << "SAP-Guest User/Pass - incorrect" << endl;

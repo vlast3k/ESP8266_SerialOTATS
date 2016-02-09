@@ -1,0 +1,1 @@
+curl "http://184.106.153.149/update?key=DGGCXZLPWWX0NUIB&field1=567&field2=355.1&field3=347.7&field4=0.0&field5=50.4&field6=0.0&field7=664" 
